@@ -7,6 +7,7 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/joho/godotenv"
 	. "github.com/obieq/goar"
 	c "github.com/orchestrate-io/gorc"
 )
@@ -23,7 +24,11 @@ var (
 
 var connectOpts = func() map[string]string {
 	opts := make(map[string]string)
-	opts["api_key"] = os.Getenv("ORCHESTRATE_API_KEY")
+	if envs, err := godotenv.Read(); err != nil {
+		log.Fatal("Error loading .env file")
+	} else {
+		opts["api_key"] = os.Getenv(envs["ORCHESTRATE_API_KEY"])
+	}
 
 	return opts
 }
