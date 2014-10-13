@@ -101,9 +101,9 @@ func (ar *ArOrchestrate) DbSave() error {
 	var err error
 
 	if ar.UpdatedAt != nil {
-		client.Put(ar.ModelName(), ar.Id, ar.Self())
+		_, err = client.Put(ar.ModelName(), ar.Id, ar.Self())
 	} else {
-		client.PutIfAbsent(ar.ModelName(), ar.Id, ar.Self())
+		_, err = client.PutIfAbsent(ar.ModelName(), ar.Id, ar.Self())
 	}
 
 	return err

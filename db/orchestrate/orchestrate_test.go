@@ -70,6 +70,17 @@ var _ = Describe("Orchestrate", func() {
 				Ω(model.Id).Should(Equal(ModelS.Id))
 			})
 
+			It("should not create a model using an existing id", func() {
+				Sprite.Delete()
+				Ω(Sprite.Save()).Should(BeTrue())
+
+				// reset CreatedAt
+				Sprite.CreatedAt = nil
+				success, err := Sprite.Save() // id is still the same, so save should fail
+				Ω(err).To(HaveOccurred())
+				Ω(success).Should(BeFalse())
+			})
+
 			It("should update an existing model", func() {
 				Sprite.Delete()
 				Ω(Sprite.Save()).Should(BeTrue())
@@ -156,10 +167,18 @@ var _ = Describe("Orchestrate", func() {
 				results = []OrchestrateAutomobile{}
 				if !searchDataLoaded {
 					fmt.Println("Loading Orchestrate Search Data")
+					// first, delete all autos that may have been generated during previous tests
+					Panamera.Delete()
+					Evoque.Delete()
+					Bugatti.Delete()
+
+					// next, create test data
 					Ω(Panamera.Save()).Should(BeTrue())
 					Ω(Evoque.Save()).Should(BeTrue())
 					Ω(Bugatti.Save()).Should(BeTrue())
-					time.Sleep(1000 * time.Millisecond) // need to wait in order for new recs to be indexed
+
+					// wait for the new test data to be indexed
+					time.Sleep(1000 * time.Millisecond)
 
 					searchDataLoaded = true
 				}

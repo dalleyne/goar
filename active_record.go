@@ -178,7 +178,7 @@ func (ar *ActiveRecord) Save() (success bool, err error) {
 		}
 	}
 
-	return !ar.Validation.HasErrors(), err
+	return !ar.Validation.HasErrors() && err == nil, err
 }
 func (ar *ActiveRecord) Delete() error {
 	return ar.self.(Persister).DbDelete()
