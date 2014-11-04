@@ -167,11 +167,11 @@ func mapResults(orchestrateResults interface{}, models interface{}) (err error) 
 	}
 	slicev := modelsv.Elem()
 	elemt := slicev.Type().Elem()
-	elemp := reflect.New(elemt)
 
 	switch t := orchestrateResults.(type) {
 	case []c.KVResult:
 		for _, result := range t {
+			elemp := reflect.New(elemt)
 			if err = result.Value(elemp.Interface()); err != nil {
 				return err
 			}
@@ -180,6 +180,7 @@ func mapResults(orchestrateResults interface{}, models interface{}) (err error) 
 		}
 	case []c.SearchResult:
 		for _, result := range t {
+			elemp := reflect.New(elemt)
 			if err = result.Value(elemp.Interface()); err != nil {
 				return err
 			}
