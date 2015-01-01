@@ -14,7 +14,7 @@ import (
 
 type ArOrchestrate struct {
 	ActiveRecord
-	Id string
+	ID string `json:"id,omitempty"`
 	Timestamps
 }
 
@@ -101,16 +101,16 @@ func (ar *ArOrchestrate) DbSave() error {
 	var err error
 
 	if ar.UpdatedAt != nil {
-		_, err = client.Put(ar.ModelName(), ar.Id, ar.Self())
+		_, err = client.Put(ar.ModelName(), ar.ID, ar.Self())
 	} else {
-		_, err = client.PutIfAbsent(ar.ModelName(), ar.Id, ar.Self())
+		_, err = client.PutIfAbsent(ar.ModelName(), ar.ID, ar.Self())
 	}
 
 	return err
 }
 
 func (ar *ArOrchestrate) DbDelete() (err error) {
-	return client.Delete(ar.ModelName(), ar.Id)
+	return client.Delete(ar.ModelName(), ar.ID)
 }
 
 func (ar *ArOrchestrate) DbSearch(models interface{}) (err error) {

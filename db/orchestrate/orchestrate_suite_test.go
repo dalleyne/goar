@@ -32,7 +32,7 @@ func TestOrchestrate(t *testing.T) {
 }
 
 func (dbModel OrchestrateAutomobile) AssertDbPropertyMappings(model OrchestrateAutomobile, isDbUpdate bool) {
-	Ω(dbModel.Id).Should(Equal(model.Id))
+	Ω(dbModel.ID).Should(Equal(model.ID))
 	Ω(dbModel.Year).Should(Equal(model.Year))
 	Ω(dbModel.Make).Should(Equal(model.Make))
 	Ω(dbModel.Model).Should(Equal(model.Model))

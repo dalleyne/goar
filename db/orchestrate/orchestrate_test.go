@@ -31,32 +31,32 @@ var _ = Describe("Orchestrate", func() {
 			//ModelS = OrchestrateAutomobile{SafetyRating: 5, Automobile: Automobile{Vehicle: Vehicle{Make: "tesla", Year: 2009, Model: "model s"}}}.ToActiveRecord()
 			ModelS = OrchestrateAutomobile{SafetyRating: 5, Automobile: Automobile{Vehicle: Vehicle{Make: "tesla", Year: 2009, Model: "model s"}}}
 			ToActiveRecord(&ModelS)
-			ModelS.Id = "id1"
+			ModelS.ID = "id1"
 			Ω(ModelS.Valid()).Should(BeTrue())
 
 			MK = OrchestrateAutomobile{SafetyRating: 3, Automobile: Automobile{Vehicle: Vehicle{Make: "austin healey", Year: 1960, Model: "3000"}}}
 			ToActiveRecord(&MK)
-			MK.Id = "id2"
+			MK.ID = "id2"
 			Ω(MK.Valid()).Should(BeTrue())
 
 			Sprite = OrchestrateAutomobile{SafetyRating: 2, Automobile: Automobile{Vehicle: Vehicle{Make: "austin healey", Year: 1960, Model: "sprite"}}}
 			ToActiveRecord(&Sprite)
-			Sprite.Id = "id3"
+			Sprite.ID = "id3"
 			Ω(Sprite.Valid()).Should(BeTrue())
 
 			Panamera = OrchestrateAutomobile{SafetyRating: 5, Automobile: Automobile{Vehicle: Vehicle{Make: "porsche", Year: 2010, Model: "panamera"}}}
 			ToActiveRecord(&Panamera)
-			Panamera.Id = "id4"
+			Panamera.ID = "id4"
 			Ω(Panamera.Valid()).Should(BeTrue())
 
 			Evoque = OrchestrateAutomobile{SafetyRating: 1, Automobile: Automobile{Vehicle: Vehicle{Make: "land rover", Year: 2013, Model: "evoque"}}}
 			ToActiveRecord(&Evoque)
-			Evoque.Id = "id5"
+			Evoque.ID = "id5"
 			Ω(Evoque.Valid()).Should(BeTrue())
 
 			Bugatti = OrchestrateAutomobile{SafetyRating: 4, Automobile: Automobile{Vehicle: Vehicle{Make: "bugatti", Year: 2013, Model: "veyron"}}}
 			ToActiveRecord(&Bugatti)
-			Bugatti.Id = "id6"
+			Bugatti.ID = "id6"
 			Ω(Bugatti.Valid()).Should(BeTrue())
 		})
 
@@ -64,10 +64,10 @@ var _ = Describe("Orchestrate", func() {
 			It("should create a model and find it by id", func() {
 				Ω(ModelS.Save()).Should(BeTrue())
 
-				result, _ := OrchestrateAutomobile{}.ToActiveRecord().Find(ModelS.Id)
+				result, _ := OrchestrateAutomobile{}.ToActiveRecord().Find(ModelS.ID)
 				Ω(result).ShouldNot(BeNil())
 				model := result.(*OrchestrateAutomobile)
-				Ω(model.Id).Should(Equal(ModelS.Id))
+				Ω(model.ID).Should(Equal(ModelS.ID))
 			})
 
 			It("should not create a model using an existing id", func() {
@@ -88,10 +88,10 @@ var _ = Describe("Orchestrate", func() {
 				modelName := Sprite.Model
 
 				// create
-				result, _ := ar.Find(Sprite.Id)
+				result, _ := ar.Find(Sprite.ID)
 				Ω(result).ShouldNot(BeNil())
 				dbModel := result.(*OrchestrateAutomobile).ToActiveRecord()
-				Ω(dbModel.Id).Should(Equal(Sprite.Id))
+				Ω(dbModel.ID).Should(Equal(Sprite.ID))
 				Ω(dbModel.CreatedAt).ShouldNot(BeNil())
 				Ω(dbModel.UpdatedAt).Should(BeNil())
 
@@ -101,7 +101,7 @@ var _ = Describe("Orchestrate", func() {
 				Ω(dbModel.Save()).Should(BeTrue())
 
 				// verify updates
-				result, err := ar.Find(Sprite.Id)
+				result, err := ar.Find(Sprite.ID)
 				Expect(err).NotTo(HaveOccurred())
 				Ω(result).ShouldNot(BeNil())
 				Ω(dbModel.Year).Should(Equal(year + 1))
@@ -113,7 +113,7 @@ var _ = Describe("Orchestrate", func() {
 			It("should delete an existing model", func() {
 				// create and verify
 				Ω(MK.Save()).Should(BeTrue())
-				result, _ := ar.Find(MK.Id)
+				result, _ := ar.Find(MK.ID)
 				Ω(result).ShouldNot(BeNil())
 
 				// delete
@@ -121,7 +121,7 @@ var _ = Describe("Orchestrate", func() {
 				Ω(err).NotTo(HaveOccurred())
 
 				// verify delete
-				result, _ = ar.Find(MK.Id)
+				result, _ = ar.Find(MK.ID)
 				Ω(result).Should(BeNil())
 			})
 
@@ -143,9 +143,9 @@ var _ = Describe("Orchestrate", func() {
 				Ω(len(results)).Should(BeNumerically(">=", 2))
 
 				for _, model := range results {
-					if model.Id == Panamera.Id {
+					if model.ID == Panamera.ID {
 						dbPanamera = model
-					} else if model.Id == Evoque.Id {
+					} else if model.ID == Evoque.ID {
 						dbEvoque = model
 					}
 				}

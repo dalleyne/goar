@@ -41,8 +41,8 @@ type ActiveRecordInterfacer interface {
 }
 
 type Timestamps struct {
-	CreatedAt *time.Time // `gorethink:"created_at,omitempty" json:"created_at,omitempty"`
-	UpdatedAt *time.Time // `gorethink:"updated_at,omitempty" json:"updated_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 type ActiveRecord struct {
