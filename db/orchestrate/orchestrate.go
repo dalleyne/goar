@@ -110,7 +110,7 @@ func (ar *ArOrchestrate) DbSave() error {
 }
 
 func (ar *ArOrchestrate) DbDelete() (err error) {
-	return client.Delete(ar.ModelName(), ar.ID)
+	return client.Purge(ar.ModelName(), ar.ID)
 }
 
 func (ar *ArOrchestrate) DbSearch(models interface{}) (err error) {
