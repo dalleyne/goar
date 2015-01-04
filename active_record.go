@@ -16,6 +16,7 @@ var modelNames map[string]string = map[string]string{}
 type Validater interface {
 	Valid() bool
 	Validate()
+	Errors() []*ValidationError
 }
 
 type Persister interface {
@@ -143,6 +144,11 @@ func (ar *ActiveRecord) Run(results interface{}) error {
 func (ar *ActiveRecord) Valid() bool {
 	ar.self.Validate()
 	return !ar.Validation.HasErrors()
+}
+
+func (ar *ActiveRecord) Errors() []*ValidationError {
+	ar.self.Validate() // TODO: is this call necessary???
+	return ar.Validation.Errors
 }
 
 func (ar *ActiveRecord) Save() (success bool, err error) {
