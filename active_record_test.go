@@ -1,11 +1,12 @@
 package goar
 
 import (
-	. "bitbucket.org/obieq/pnl_api/goar/tests/models"
 	"errors"
+	"reflect"
+
+	. "github.com/obieq/goar/tests/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"reflect"
 )
 
 type ActiveRecordVehicle struct {
@@ -27,7 +28,7 @@ type CallbackErrorModel struct {
 	Name string
 }
 
-func (ar *ActiveRecordVehicle) All(interface{}) error {
+func (ar *ActiveRecordVehicle) All(interface{}, map[string]interface{}) error {
 	return nil
 }
 

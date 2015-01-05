@@ -52,14 +52,6 @@ type ActiveRecord struct {
 	query *Query
 }
 
-func ToActiveRecord(model ActiveRecordInterfacer) ActiveRecordInterfacer {
-	//ToAR(model)
-	model.SetSelf(model)
-	model.SetQuery(NewQuery())
-
-	return model
-}
-
 func (ar *ActiveRecord) ModelName() string {
 	arr := strings.Split(reflect.TypeOf(ar.self).String(), ".")
 	struct_name := arr[len(arr)-1]

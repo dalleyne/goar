@@ -30,32 +30,32 @@ var _ = Describe("Orchestrate", func() {
 		BeforeEach(func() {
 			//ModelS = OrchestrateAutomobile{SafetyRating: 5, Automobile: Automobile{Vehicle: Vehicle{Make: "tesla", Year: 2009, Model: "model s"}}}.ToActiveRecord()
 			ModelS = OrchestrateAutomobile{SafetyRating: 5, Automobile: Automobile{Vehicle: Vehicle{Make: "tesla", Year: 2009, Model: "model s"}}}
-			ToActiveRecord(&ModelS)
+			ToAR(&ModelS)
 			ModelS.ID = "id1"
 			Ω(ModelS.Valid()).Should(BeTrue())
 
 			MK = OrchestrateAutomobile{SafetyRating: 3, Automobile: Automobile{Vehicle: Vehicle{Make: "austin healey", Year: 1960, Model: "3000"}}}
-			ToActiveRecord(&MK)
+			ToAR(&MK)
 			MK.ID = "id2"
 			Ω(MK.Valid()).Should(BeTrue())
 
 			Sprite = OrchestrateAutomobile{SafetyRating: 2, Automobile: Automobile{Vehicle: Vehicle{Make: "austin healey", Year: 1960, Model: "sprite"}}}
-			ToActiveRecord(&Sprite)
+			ToAR(&Sprite)
 			Sprite.ID = "id3"
 			Ω(Sprite.Valid()).Should(BeTrue())
 
 			Panamera = OrchestrateAutomobile{SafetyRating: 5, Automobile: Automobile{Vehicle: Vehicle{Make: "porsche", Year: 2010, Model: "panamera"}}}
-			ToActiveRecord(&Panamera)
+			ToAR(&Panamera)
 			Panamera.ID = "id4"
 			Ω(Panamera.Valid()).Should(BeTrue())
 
 			Evoque = OrchestrateAutomobile{SafetyRating: 1, Automobile: Automobile{Vehicle: Vehicle{Make: "land rover", Year: 2013, Model: "evoque"}}}
-			ToActiveRecord(&Evoque)
+			ToAR(&Evoque)
 			Evoque.ID = "id5"
 			Ω(Evoque.Valid()).Should(BeTrue())
 
 			Bugatti = OrchestrateAutomobile{SafetyRating: 4, Automobile: Automobile{Vehicle: Vehicle{Make: "bugatti", Year: 2013, Model: "veyron"}}}
-			ToActiveRecord(&Bugatti)
+			ToAR(&Bugatti)
 			Bugatti.ID = "id6"
 			Ω(Bugatti.Valid()).Should(BeTrue())
 		})
