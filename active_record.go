@@ -6,8 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gedex/inflector"
-	"github.com/obieq/goar/active_support"
+	as "github.com/obieq/goar/active_support"
 	. "github.com/obieq/goar/validations"
 )
 
@@ -53,16 +52,17 @@ type ActiveRecord struct {
 }
 
 func (ar *ActiveRecord) ModelName() string {
-	arr := strings.Split(reflect.TypeOf(ar.self).String(), ".")
-	struct_name := arr[len(arr)-1]
+	key := reflect.TypeOf(ar.self).String()
 
-	underscored_name := modelNames[struct_name]
-	if underscored_name == "" {
-		underscored_name = active_support.String(inflector.Pluralize(struct_name)).Underscore()
-		modelNames[struct_name] = underscored_name
+	underscoredName := modelNames[key]
+	if underscoredName == "" {
+		arr := strings.Split(key, ".")
+		structName := arr[len(arr)-1]
+		underscoredName = as.String(as.String(structName).Pluralize()).Underscore()
+		modelNames[key] = underscoredName
 	}
 
-	return underscored_name
+	return underscoredName
 }
 
 //func (ar *ActiveRecord) PrimaryKey() string {
