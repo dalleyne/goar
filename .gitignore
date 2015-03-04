@@ -13,3 +13,6 @@
 
 # Ignore swap files
 *.swp
+
+# Ignore env files
+.env
