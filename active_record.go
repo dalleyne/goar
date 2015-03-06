@@ -40,6 +40,10 @@ type ActiveRecordInterfacer interface {
 	Delete() error
 }
 
+type CustomModelNamer interface {
+	CustomModelName() string
+}
+
 type Timestamps struct {
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
@@ -52,17 +56,23 @@ type ActiveRecord struct {
 }
 
 func (ar *ActiveRecord) ModelName() string {
-	key := reflect.TypeOf(ar.self).String()
+	var name, key string
 
-	underscoredName := modelNames[key]
-	if underscoredName == "" {
-		arr := strings.Split(key, ".")
-		structName := arr[len(arr)-1]
-		underscoredName = as.String(as.String(structName).Pluralize()).Underscore()
-		modelNames[key] = underscoredName
+	if v, ok := ar.self.(CustomModelNamer); ok {
+		name = v.CustomModelName()
+	} else {
+		key = reflect.TypeOf(ar.self).String()
+		name = modelNames[key]
 	}
 
-	return underscoredName
+	if name == "" {
+		arr := strings.Split(key, ".")
+		structName := arr[len(arr)-1]
+		name = as.String(as.String(structName).Pluralize()).Underscore()
+		modelNames[key] = name
+	}
+
+	return name
 }
 
 //func (ar *ActiveRecord) PrimaryKey() string {
