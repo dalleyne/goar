@@ -25,10 +25,9 @@ var (
 
 var connectOpts = func() r.ConnectOpts {
 	return r.ConnectOpts{
-		Address:     os.Getenv("RETHINKDB_URL"),
-		MaxIdle:     10,
-		MaxActive:   25,
-		IdleTimeout: time.Second * 10,
+		Address: os.Getenv("RETHINKDB_URL"),
+		MaxIdle: 10,
+		MaxOpen: 25,
 	}
 }
 
@@ -56,7 +55,7 @@ func SetDbName(name string) {
 	dbName = name
 }
 
-func (ar *ArRethinkDb) All(results interface{}) error {
+func (ar *ArRethinkDb) All(results interface{}, opts map[string]interface{}) error {
 	//result := []interface{}{}
 	//self := ar.Self()
 	//modelVal := reflect.ValueOf(self).Elem()
@@ -114,7 +113,9 @@ func (ar *ArRethinkDb) Find(id interface{}) (interface{}, error) {
 }
 
 func (ar *ArRethinkDb) DbSave() (err error) {
-	_, err = r.Db(dbName).Table(ar.Self().ModelName()).Insert(ar.Self(), r.InsertOpts{Upsert: true}).RunWrite(session)
+	// Conflict parameter values: "error" (default), "replace", "update"
+	// http://rethinkdb.com/api/javascript/insert/
+	_, err = r.Db(dbName).Table(ar.Self().ModelName()).Insert(ar.Self(), r.InsertOpts{Conflict: "update"}).RunWrite(session)
 	return err
 }
 
