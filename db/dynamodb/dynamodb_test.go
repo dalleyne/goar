@@ -25,7 +25,6 @@ var _ = Describe("Dynamodb", func() {
 
 	Context("DB Interactions", func() {
 		BeforeEach(func() {
-			//ModelS = DynamodbAutomobile{SafetyRating: 5, Automobile: Automobile{Vehicle: Vehicle{Make: "tesla", Year: 2009, Model: "model s"}}}.ToActiveRecord()
 			ModelS = DynamodbAutomobile{SafetyRating: 5, Automobile: Automobile{Vehicle: Vehicle{Make: "tesla", Year: 2009, Model: "model s"}}}
 			ToAR(&ModelS)
 			ModelS.ID = "id1"
@@ -73,17 +72,6 @@ var _ = Describe("Dynamodb", func() {
 				Ω(model.CreatedAt).ShouldNot(BeNil())
 			})
 
-			//It("should not create a model using an existing id", func() {
-			//Sprite.Delete()
-			//Ω(Sprite.Save()).Should(BeTrue())
-
-			//// reset CreatedAt
-			//Sprite.CreatedAt = nil
-			//success, err := Sprite.Save() // id is still the same, so save should fail
-			//Ω(err).To(HaveOccurred())
-			//Ω(success).Should(BeFalse())
-			//})
-
 			It("should update an existing model", func() {
 				Sprite.Delete()
 				Ω(Sprite.Save()).Should(BeTrue())
@@ -101,16 +89,57 @@ var _ = Describe("Dynamodb", func() {
 				// update
 				dbModel.Year += 1
 				dbModel.Model += " updated"
-				Ω(dbModel.Save()).Should(BeTrue())
+
+				success, err := dbModel.Save()
+				Ω(err).Should(BeNil())
+				Ω(success).Should(BeTrue())
 
 				// verify updates
-				result, err := ar.Find(Sprite.ID)
+				result, err = ar.Find(Sprite.ID)
 				Expect(err).NotTo(HaveOccurred())
 				Ω(result).ShouldNot(BeNil())
 				Ω(dbModel.Year).Should(Equal(year + 1))
 				Ω(dbModel.Model).Should(Equal(modelName + " updated"))
 				Ω(dbModel.CreatedAt).ShouldNot(BeNil())
 				Ω(dbModel.UpdatedAt).ShouldNot(BeNil())
+			})
+
+			It("should perform partial (patch) updates", func() {
+				Sprite.Delete()
+
+				// create
+				Ω(Sprite.Save()).Should(BeTrue())
+				year := Sprite.Year
+				modelName := Sprite.Model
+				safetyRating := Sprite.SafetyRating
+
+				// verify
+				result, _ := ar.Find(Sprite.ID)
+				Ω(result).ShouldNot(BeNil())
+				dbModel := result.(*DynamodbAutomobile).ToActiveRecord()
+				Ω(dbModel.ID).Should(Equal(Sprite.ID))
+				Ω(dbModel.CreatedAt).ShouldNot(BeNil())
+				Ω(dbModel.UpdatedAt).Should(BeNil())
+
+				// partial update
+				s2 := &DynamodbAutomobile{SafetyRating: safetyRating + 1}
+				s2.ID = Sprite.ID
+				ToAR(s2)
+				success, err := s2.Patch()
+				Ω(err).Should(BeNil())
+				Ω(s2.Validation.Errors).Should(BeNil())
+				Ω(success).Should(BeTrue())
+
+				// verify updates
+				result, err = ar.Find(Sprite.ID)
+				Expect(err).NotTo(HaveOccurred())
+				Ω(result).ShouldNot(BeNil())
+				dbModel = result.(*DynamodbAutomobile).ToActiveRecord()
+				Ω(dbModel.Year).Should(Equal(year))                     // should be no change
+				Ω(dbModel.Model).Should(Equal(modelName))               // should be no change
+				Ω(dbModel.SafetyRating).Should(Equal(safetyRating + 1)) // should have incremented by one
+				Ω(dbModel.CreatedAt).ShouldNot(BeNil())                 // should be no change
+				Ω(dbModel.UpdatedAt).ShouldNot(BeNil())                 // should have been set via active record framework
 			})
 
 			It("should delete an existing model", func() {
