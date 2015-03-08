@@ -3,8 +3,9 @@ package rethinkdb
 import (
 	"runtime"
 
-	. "bitbucket.org/obieq/pnl_api/goar"
-	. "bitbucket.org/obieq/pnl_api/goar/tests/models"
+	. "github.com/obieq/goar"
+	. "github.com/obieq/goar/tests/models"
+
 	r "github.com/dancannon/gorethink"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -92,7 +93,7 @@ var _ = Describe("ActiveRecord", func() {
 		It("should return an error when the All() method is called", func() {
 			var results []ErrorTestingModel
 			errorModel := ErrorTestingModel{}.ToActiveRecord()
-			err := errorModel.All(results)
+			err := errorModel.All(results, nil)
 			Ω(err).ShouldNot(BeNil())
 		})
 
@@ -198,7 +199,7 @@ var _ = Describe("ActiveRecord", func() {
 				Ω(MK.Save()).Should(BeTrue())
 
 				var results []RethinkDbAutomobile
-				DbModel.All(&results)
+				DbModel.All(&results, nil)
 				Ω(len(results)).Should(Equal(2))
 
 				ids := []string{ModelS.Id, MK.Id}

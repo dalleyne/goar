@@ -1,11 +1,19 @@
 package rethinkdb
 
 import (
-	. "bitbucket.org/obieq/pnl_api/goar/migration"
-	r "github.com/dancannon/gorethink"
 	"log"
 	"strings"
+
+	r "github.com/dancannon/gorethink"
 )
+
+type Migrator interface {
+	CreateDb(dbName string) error
+	DropDb(dbName string) error
+	CreateTable(tableName string) error
+	DropTable(tableName string) error
+	AddIndex(tableName string, fields []string, opts map[string]interface{}) error
+}
 
 type RethinkDbMigration struct {
 	Migrator
