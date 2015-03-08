@@ -2,7 +2,7 @@ package dynamodb
 
 import (
 	"errors"
-	"log"
+	"fmt"
 	"os"
 	"reflect"
 	"time"
@@ -24,11 +24,15 @@ var (
 	client *dynamo.Server
 )
 
+var envVars = func() (map[string]string, error) {
+	return godotenv.Read()
+}
+
 var connectOpts = func() map[string]string {
 	opts := make(map[string]string)
 
-	if envs, err := godotenv.Read(); err != nil {
-		log.Fatal("Error loading .env file: ", err)
+	if envs, err := envVars(); err != nil {
+		panic(fmt.Errorf("Error loading .env file: %v", err))
 	} else {
 		opts["accessKey"] = os.Getenv(envs["AWS_ACCESS_KEY_ID"])
 		opts["secretKey"] = os.Getenv(envs["AWS_SECRET_ACCESS_KEY"])
@@ -101,11 +105,9 @@ func (ar *ArDynamodb) Patch() (bool, error) {
 	//       get the persisted instance if one exists in order to update
 	//       the subset of fields.  If we didn't do so, then biz rule validations
 	//       could fail b/c of the incomplete data
-	if dbInstance, err := ar.Find(ar.ID); err != nil { // instance not found, so insert
-		if success = ar.Valid(); success {
-			err = tbl.PutDocument(key, ar.Self())
-		}
-	} else { // instance found, so update
+	dbInstance, err := ar.Find(ar.ID)
+
+	if err == nil { // instance found, so update
 		var arr []reflect.Value
 
 		// sync db instance and self instance

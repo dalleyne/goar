@@ -1,8 +1,10 @@
-package dynamodb_test
+package dynamodb
 
 import (
+	"errors"
+	"runtime"
+
 	. "github.com/obieq/goar"
-	. "github.com/obieq/goar/db/dynamodb"
 	. "github.com/obieq/goar/tests/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -13,6 +15,10 @@ var _ = Describe("Dynamodb", func() {
 		ModelS, MK, Sprite, Panamera, Evoque, Bugatti DynamodbAutomobile
 		ar                                            *DynamodbAutomobile
 	)
+
+	var errEnvVars = func() (map[string]string, error) {
+		return nil, errors.New("EnvVars Error")
+	}
 
 	BeforeEach(func() {
 		ar = DynamodbAutomobile{}.ToActiveRecord()
@@ -57,22 +63,52 @@ var _ = Describe("Dynamodb", func() {
 		})
 
 		Context("Error Handling", func() {
+			It("should return an error when calling envVars", func() {
+				// swallow the panic method that occurs during this test
+				var err error
+				defer func() {
+					if e := recover(); e != nil {
+						if _, ok := e.(runtime.Error); ok {
+							panic(e)
+						}
+						err = e.(error)
+					}
+				}()
+				envVars = errEnvVars
+				connect()
+				Ω(err).To(HaveOccurred())
+			})
+
 			It("should return an error when the Truncate() method is called", func() {
-				errorModel := DynamodbAutomobile{}.ToActiveRecord()
-				_, err := errorModel.Truncate()
+				auto := DynamodbAutomobile{}.ToActiveRecord()
+				_, err := auto.Truncate()
 				Ω(err).ShouldNot(BeNil())
 			})
 
 			It("should return an error when the All() method is called", func() {
-				errorModel := DynamodbAutomobile{}.ToActiveRecord()
-				err := errorModel.All(errorModel, nil)
+				auto := DynamodbAutomobile{}.ToActiveRecord()
+				err := auto.All(auto, nil)
 				Ω(err).ShouldNot(BeNil())
 			})
 
 			It("should return an error when the Search() method is called", func() {
-				errorModel := DynamodbAutomobile{}.ToActiveRecord()
-				err := errorModel.DbSearch(errorModel)
+				auto := DynamodbAutomobile{}.ToActiveRecord()
+				err := auto.DbSearch(auto)
 				Ω(err).ShouldNot(BeNil())
+			})
+
+			It("should return an error when trying to find an ID that doesn't exist", func() {
+				auto, err := DynamodbAutomobile{}.ToActiveRecord().Find("does not exist")
+				Expect(err).To(HaveOccurred())
+				Ω(auto).Should(BeNil())
+			})
+
+			It("should return an error when trying to patch an ID that doesn't exist", func() {
+				auto := DynamodbAutomobile{}.ToActiveRecord()
+				auto.ID = "does not exist"
+				success, err := auto.Patch()
+				Expect(err).To(HaveOccurred())
+				Ω(success).Should(BeFalse())
 			})
 		})
 
@@ -142,9 +178,8 @@ var _ = Describe("Dynamodb", func() {
 				Ω(dbModel.UpdatedAt).Should(BeNil())
 
 				// partial update
-				s2 := &DynamodbAutomobile{SafetyRating: safetyRating + 1}
+				s2 := DynamodbAutomobile{SafetyRating: safetyRating + 1}.ToActiveRecord()
 				s2.ID = Sprite.ID
-				ToAR(s2)
 				success, err := s2.Patch()
 				Ω(err).Should(BeNil())
 				Ω(s2.Validation.Errors).Should(BeNil())

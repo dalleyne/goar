@@ -1,10 +1,9 @@
-package dynamodb_test
+package dynamodb
 
 import (
 	"testing"
 
 	. "github.com/obieq/goar"
-	. "github.com/obieq/goar/db/dynamodb"
 	. "github.com/obieq/goar/tests/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
