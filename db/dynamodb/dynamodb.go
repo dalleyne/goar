@@ -102,7 +102,9 @@ func (ar *ArDynamodb) Patch() (bool, error) {
 	//       the subset of fields.  If we didn't do so, then biz rule validations
 	//       could fail b/c of the incomplete data
 	if dbInstance, err := ar.Find(ar.ID); err != nil { // instance not found, so insert
-		err = tbl.PutDocument(key, ar.Self())
+		if success = ar.Valid(); success {
+			err = tbl.PutDocument(key, ar.Self())
+		}
 	} else { // instance found, so update
 		var arr []reflect.Value
 
