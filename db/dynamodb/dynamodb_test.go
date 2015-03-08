@@ -56,6 +56,26 @@ var _ = Describe("Dynamodb", func() {
 			Ω(Bugatti.Valid()).Should(BeTrue())
 		})
 
+		Context("Error Handling", func() {
+			It("should return an error when the Truncate() method is called", func() {
+				errorModel := DynamodbAutomobile{}.ToActiveRecord()
+				_, err := errorModel.Truncate()
+				Ω(err).ShouldNot(BeNil())
+			})
+
+			It("should return an error when the All() method is called", func() {
+				errorModel := DynamodbAutomobile{}.ToActiveRecord()
+				err := errorModel.All(errorModel, nil)
+				Ω(err).ShouldNot(BeNil())
+			})
+
+			It("should return an error when the Search() method is called", func() {
+				errorModel := DynamodbAutomobile{}.ToActiveRecord()
+				err := errorModel.DbSearch(errorModel)
+				Ω(err).ShouldNot(BeNil())
+			})
+		})
+
 		Context("Persistance", func() {
 			It("should create a model and find it by id", func() {
 				success, err := ModelS.Save()
