@@ -16,9 +16,9 @@ type CloudantAutomobile struct {
 }
 
 func (m *CloudantAutomobile) Validate() {
-	m.Validation.Required(m.Year)
-	m.Validation.Required(m.Make)
-	m.Validation.Required(m.Model)
+	m.Validation.Required("Year", m.Year)
+	m.Validation.Required("Make", m.Make)
+	m.Validation.Required("Model", m.Model)
 }
 
 func (model CloudantAutomobile) ToActiveRecord() *CloudantAutomobile {
