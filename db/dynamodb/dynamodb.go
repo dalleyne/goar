@@ -117,6 +117,7 @@ func (ar *ArDynamodb) Patch() (bool, error) {
 		destination := method.Call(arr)[0].Interface()
 
 		// merge patch changes into existing instance
+		// NOTE: nil/empty values don't appear to overwrite existing values
 		err = mergo.Merge(destination, source)
 
 		if err == nil {
@@ -125,7 +126,8 @@ func (ar *ArDynamodb) Patch() (bool, error) {
 			ar.UpdatedAt = &updatedAt // given the use of pointers, no need to use reflection
 
 			// run validations and update
-			if success = ar.Valid(); success {
+			success = ar.Valid()
+			if success == true {
 				err = tbl.PutDocument(key, destination)
 			}
 		}
