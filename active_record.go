@@ -149,7 +149,7 @@ func (ar *ActiveRecord) Valid() bool {
 }
 
 func (ar *ActiveRecord) Errors() map[string]*ValidationError {
-	ar.self.Validate() // TODO: is this call necessary???
+	//ar.self.Validate() // TODO: is this call necessary???
 	return ar.Validation.ErrorMap()
 }
 
