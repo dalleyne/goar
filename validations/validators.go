@@ -10,9 +10,16 @@ import (
 type Validator interface {
 	IsSatisfied(interface{}) bool
 	DefaultMessage() string
+	GetKey() string
 }
 
-type Required struct{}
+type Required struct {
+	Key string
+}
+
+func (v Required) GetKey() string {
+	return v.Key
+}
 
 func ValidRequired() Required {
 	return Required{}
@@ -47,11 +54,16 @@ func (r Required) DefaultMessage() string {
 }
 
 type Min struct {
+	Key string
 	Min int
 }
 
+func (v Min) GetKey() string {
+	return v.Key
+}
+
 func ValidMin(min int) Min {
-	return Min{min}
+	return Min{Min: min}
 }
 
 func (m Min) IsSatisfied(obj interface{}) bool {
@@ -67,11 +79,16 @@ func (m Min) DefaultMessage() string {
 }
 
 type Max struct {
+	Key string
 	Max int
 }
 
+func (v Max) GetKey() string {
+	return v.Key
+}
+
 func ValidMax(max int) Max {
-	return Max{max}
+	return Max{Max: max}
 }
 
 func (m Max) IsSatisfied(obj interface{}) bool {
@@ -88,12 +105,17 @@ func (m Max) DefaultMessage() string {
 
 // Requires an integer to be within Min, Max inclusive.
 type Range struct {
+	Key string
 	Min
 	Max
 }
 
+func (v Range) GetKey() string {
+	return v.Key
+}
+
 func ValidRange(min, max int) Range {
-	return Range{Min{min}, Max{max}}
+	return Range{Min: Min{Min: min}, Max: Max{Max: max}}
 }
 
 func (r Range) IsSatisfied(obj interface{}) bool {
@@ -106,11 +128,16 @@ func (r Range) DefaultMessage() string {
 
 // Requires an array or string to be at least a given length.
 type MinSize struct {
+	Key string
 	Min int
 }
 
+func (v MinSize) GetKey() string {
+	return v.Key
+}
+
 func ValidMinSize(min int) MinSize {
-	return MinSize{min}
+	return MinSize{Min: min}
 }
 
 func (m MinSize) IsSatisfied(obj interface{}) bool {
@@ -130,11 +157,16 @@ func (m MinSize) DefaultMessage() string {
 
 // Requires an array or string to be at most a given length.
 type MaxSize struct {
+	Key string
 	Max int
 }
 
+func (v MaxSize) GetKey() string {
+	return v.Key
+}
+
 func ValidMaxSize(max int) MaxSize {
-	return MaxSize{max}
+	return MaxSize{Max: max}
 }
 
 func (m MaxSize) IsSatisfied(obj interface{}) bool {
@@ -154,11 +186,16 @@ func (m MaxSize) DefaultMessage() string {
 
 // Requires an array or string to be exactly a given length.
 type Length struct {
-	N int
+	Key string
+	N   int
+}
+
+func (v Length) GetKey() string {
+	return v.Key
 }
 
 func ValidLength(n int) Length {
-	return Length{n}
+	return Length{N: n}
 }
 
 func (s Length) IsSatisfied(obj interface{}) bool {
@@ -178,11 +215,16 @@ func (s Length) DefaultMessage() string {
 
 // Requires a string to match a given regex.
 type Match struct {
+	Key    string
 	Regexp *regexp.Regexp
 }
 
+func (v Match) GetKey() string {
+	return v.Key
+}
+
 func ValidMatch(regex *regexp.Regexp) Match {
-	return Match{regex}
+	return Match{Regexp: regex}
 }
 
 func (m Match) IsSatisfied(obj interface{}) bool {
@@ -197,11 +239,16 @@ func (m Match) DefaultMessage() string {
 var emailPattern = regexp.MustCompile("^[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\\w](?:[\\w-]*[\\w])?\\.)+[a-zA-Z0-9](?:[\\w-]*[\\w])?$")
 
 type Email struct {
+	Key string
 	Match
 }
 
+func (v Email) GetKey() string {
+	return v.Key
+}
+
 func ValidEmail() Email {
-	return Email{Match{emailPattern}}
+	return Email{Match: Match{Regexp: emailPattern}}
 }
 
 func (e Email) DefaultMessage() string {

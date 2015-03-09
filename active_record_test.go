@@ -77,9 +77,9 @@ func (model *CallbackErrorModel) DbSearch(results interface{}) error {
 }
 
 func (m *ActiveRecordAutomobile) Validate() {
-	m.Validation.Required(m.Year)
-	m.Validation.Required(m.Make)
-	m.Validation.Required(m.Model)
+	m.Validation.Required("Year", m.Year)
+	m.Validation.Required("Make", m.Make)
+	m.Validation.Required("Model", m.Model)
 }
 
 func (m *ActiveRecordMotorcycle) Validate() {
@@ -171,12 +171,27 @@ var _ = Describe("ActiveRecord", func() {
 	Context("Validation", func() {
 		It("should be valid", func() {
 			Ω(automobile.Valid()).Should(BeTrue())
+			Ω(automobile.HasErrors()).Should(BeFalse())
 		})
 
 		It("should be invalid", func() {
 			Ω(automobile.Valid()).Should(BeTrue())
+
+			// invalidate
+			automobile.Year = 0
+			automobile.Make = ""
 			automobile.Model = ""
+
+			// validate
 			Ω(automobile.Valid()).Should(BeFalse())
+
+			// verify
+			Ω(automobile.Errors).ShouldNot(BeNil())
+			Ω(automobile.NumErrors()).Should(Equal(3))
+
+			Ω(automobile.ErrorMap()["Year"].Message).Should(Equal("Required"))
+			Ω(automobile.ErrorMap()["Make"].Message).Should(Equal("Required"))
+			Ω(automobile.ErrorMap()["Model"].Message).Should(Equal("Required"))
 		})
 	})
 

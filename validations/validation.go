@@ -1,12 +1,11 @@
 package validations
 
 import (
-	"fmt"
-	"log"
+
 	//"net/http"
 	//"net/url"
+	"fmt"
 	"regexp"
-	"runtime"
 )
 
 // Simple struct to store the Message & Key of a validation error
@@ -48,6 +47,11 @@ func (v *Validation) HasErrors() bool {
 	return len(v.Errors) > 0
 }
 
+// NumErrors returns the number of validation errors for a given instance
+func (v *Validation) NumErrors() int {
+	return len(v.Errors)
+}
+
 // ErrorMap returns the errors mapped by key.
 // If there are multiple validation errors associated with a single key, the
 // first one "wins".  (Typically the first validation will be the more basic).
@@ -62,10 +66,10 @@ func (v *Validation) ErrorMap() map[string]*ValidationError {
 }
 
 // Error adds an error to the validation context.
-func (v *Validation) Error(message string, args ...interface{}) *ValidationResult {
+func (v *Validation) Error(key string, message string, args ...interface{}) *ValidationResult {
 	result := (&ValidationResult{
 		Ok:    false,
-		Error: &ValidationError{},
+		Error: &ValidationError{Key: key},
 	}).Message(message, args...)
 	v.Errors = append(v.Errors, result.Error)
 	return result
@@ -79,12 +83,13 @@ type ValidationResult struct {
 }
 
 // Key sets the ValidationResult's Error "key" and returns itself for chaining
-func (r *ValidationResult) Key(key string) *ValidationResult {
-	if r.Error != nil {
-		r.Error.Key = key
-	}
-	return r
-}
+//func (r *ValidationResult) Key(key string) *ValidationResult {
+//log.Fatal("Key: ", key)
+//if r.Error != nil {
+//r.Error.Key = key
+//}
+//return r
+//}
 
 // Message sets the error message for a ValidationResult. Returns itself to
 // allow chaining.  Allows Sprintf() type calling with multiple parameters
@@ -100,56 +105,45 @@ func (r *ValidationResult) Message(message string, args ...interface{}) *Validat
 }
 
 // Required tests that the argument is non-nil and non-empty (if string or list)
-func (v *Validation) Required(obj interface{}) *ValidationResult {
-	return v.apply(Required{}, obj)
+func (v *Validation) Required(key string, obj interface{}) *ValidationResult {
+	return v.apply(Required{}, obj, key)
 }
 
-func (v *Validation) Min(n int, min int) *ValidationResult {
-	return v.apply(Min{min}, n)
+func (v *Validation) Min(key string, n int, min int) *ValidationResult {
+	return v.apply(Min{Min: min}, n, key)
 }
 
-func (v *Validation) Max(n int, max int) *ValidationResult {
-	return v.apply(Max{max}, n)
+func (v *Validation) Max(key string, n int, max int) *ValidationResult {
+	return v.apply(Max{Max: max}, n, key)
 }
 
-func (v *Validation) Range(n, min, max int) *ValidationResult {
-	return v.apply(Range{Min{min}, Max{max}}, n)
+func (v *Validation) Range(key string, n, min, max int) *ValidationResult {
+	return v.apply(Range{Min: Min{Min: min}, Max: Max{Max: max}}, n, key)
 }
 
-func (v *Validation) MinSize(obj interface{}, min int) *ValidationResult {
-	return v.apply(MinSize{min}, obj)
+func (v *Validation) MinSize(key string, obj interface{}, min int) *ValidationResult {
+	return v.apply(MinSize{Min: min}, obj, key)
 }
 
-func (v *Validation) MaxSize(obj interface{}, max int) *ValidationResult {
-	return v.apply(MaxSize{max}, obj)
+func (v *Validation) MaxSize(key string, obj interface{}, max int) *ValidationResult {
+	return v.apply(MaxSize{Max: max}, obj, key)
 }
 
-func (v *Validation) Length(obj interface{}, n int) *ValidationResult {
-	return v.apply(Length{n}, obj)
+func (v *Validation) Length(key string, obj interface{}, n int) *ValidationResult {
+	return v.apply(Length{N: n}, obj, key)
 }
 
-func (v *Validation) Match(str string, regex *regexp.Regexp) *ValidationResult {
-	return v.apply(Match{regex}, str)
+func (v *Validation) Match(key string, str string, regex *regexp.Regexp) *ValidationResult {
+	return v.apply(Match{Regexp: regex}, str, key)
 }
 
-func (v *Validation) Email(str string) *ValidationResult {
-	return v.apply(Email{Match{emailPattern}}, str)
+func (v *Validation) Email(key string, str string) *ValidationResult {
+	return v.apply(Email{Match: Match{Regexp: emailPattern}}, str, key)
 }
 
-func (v *Validation) apply(chk Validator, obj interface{}) *ValidationResult {
+func (v *Validation) apply(chk Validator, obj interface{}, key string) *ValidationResult {
 	if chk.IsSatisfied(obj) {
 		return &ValidationResult{Ok: true}
-	}
-
-	// Get the default key.
-	var key string
-	if pc, _, line, ok := runtime.Caller(2); ok {
-		f := runtime.FuncForPC(pc)
-		if defaultKeys, ok := DefaultValidationKeys[f.Name()]; ok {
-			key = defaultKeys[line]
-		}
-	} else {
-		log.Println("Failed to get Caller information to look up Validation key")
 	}
 
 	// Add the error to the validation context.
@@ -172,7 +166,7 @@ func (v *Validation) apply(chk Validator, obj interface{}) *ValidationResult {
 func (v *Validation) Check(obj interface{}, checks ...Validator) *ValidationResult {
 	var result *ValidationResult
 	for _, check := range checks {
-		result = v.apply(check, obj)
+		result = v.apply(check, obj, check.GetKey())
 		if !result.Ok {
 			return result
 		}
