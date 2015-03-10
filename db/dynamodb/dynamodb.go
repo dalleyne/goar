@@ -14,9 +14,12 @@ import (
 	. "github.com/obieq/goar"
 )
 
+const DB_PRIMARY_KEY_NAME string = "id"
+const MODEL_PRIMARY_KEY_NAME string = "ID"
+
 type ArDynamodb struct {
 	ActiveRecord
-	ID string `json:"ID,omitempty"`
+	ID string `json:"id,omitempty"`
 	Timestamps
 }
 
@@ -76,7 +79,7 @@ func (ar *ArDynamodb) Find(key interface{}) (interface{}, error) {
 	if err == nil {
 		// set the ID b/c the AdRoll sdk purposefully empties it for some reason
 		pointer := reflect.Indirect(reflect.ValueOf(self))
-		field := pointer.FieldByName("ID")
+		field := pointer.FieldByName(MODEL_PRIMARY_KEY_NAME)
 		field.SetString(key.(string))
 	} else {
 		self = nil
@@ -137,7 +140,7 @@ func (ar *ArDynamodb) Patch() (bool, error) {
 }
 
 func (ar *ArDynamodb) DbDelete() (err error) {
-	primary := dynamo.NewStringAttribute("ID", "")
+	primary := dynamo.NewStringAttribute(DB_PRIMARY_KEY_NAME, "")
 	pk := dynamo.PrimaryKey{KeyAttribute: primary}
 	t := dynamo.Table{Server: client, Name: ar.ModelName(), Key: pk}
 
@@ -155,7 +158,7 @@ func (ar *ArDynamodb) GetTableWithPrimaryKey(key interface{}) (dynamo.Table, *dy
 	//         primary := NewStringAttribute("TestHashKey", "")
 	//         secondary := NewNumericAttribute("TestRangeKey", "")
 	//         key := PrimaryKey{primary, secondary}
-	primary := dynamo.NewStringAttribute("ID", "")
+	primary := dynamo.NewStringAttribute(DB_PRIMARY_KEY_NAME, "")
 	pk := dynamo.PrimaryKey{KeyAttribute: primary}
 	t := dynamo.Table{Server: client, Name: ar.ModelName(), Key: pk}
 	dynamoKey := &dynamo.Key{HashKey: key.(string)}

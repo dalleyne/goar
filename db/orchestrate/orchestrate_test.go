@@ -187,8 +187,8 @@ var _ = Describe("Orchestrate", func() {
 			Context("Relational Operators", func() {
 				Context("Equal", func() {
 					It("should query with two EQ operators", func() {
-						ar.Where(QueryCondition{Key: "Year", RelationalOperator: EQ, Value: 2010})
-						err := ar.Where(QueryCondition{Key: "Model", RelationalOperator: EQ, Value: "panamera"}).Run(&results)
+						ar.Where(QueryCondition{Key: "year", RelationalOperator: EQ, Value: 2010})
+						err := ar.Where(QueryCondition{Key: "model", RelationalOperator: EQ, Value: "panamera"}).Run(&results)
 
 						Ω(err).NotTo(HaveOccurred())
 						Ω(results).ShouldNot(BeNil())
@@ -204,8 +204,8 @@ var _ = Describe("Orchestrate", func() {
 			Context("Logical Operators", func() {
 				Context("And", func() {
 					It("should query with two AND operators", func() {
-						ar.Where(QueryCondition{Key: "Year", RelationalOperator: EQ, Value: 2010})
-						err := ar.Where(QueryCondition{LogicalOperator: AND, Key: "Model", RelationalOperator: EQ, Value: "panamera"}).Run(&results)
+						ar.Where(QueryCondition{Key: "year", RelationalOperator: EQ, Value: 2010})
+						err := ar.Where(QueryCondition{LogicalOperator: AND, Key: "model", RelationalOperator: EQ, Value: "panamera"}).Run(&results)
 
 						Ω(err).NotTo(HaveOccurred())
 						Ω(results).ShouldNot(BeNil())
@@ -219,9 +219,9 @@ var _ = Describe("Orchestrate", func() {
 
 				Context("Or", func() {
 					It("should query with two OR operators", func() {
-						ar.Where(QueryCondition{Key: "Year", RelationalOperator: EQ, Value: 2010})
-						ar.Where(QueryCondition{LogicalOperator: OR, Key: "Model", RelationalOperator: EQ, Value: "veyron"})
-						err := ar.Where(QueryCondition{LogicalOperator: OR, Key: "Model", RelationalOperator: EQ, Value: "gobbledygook"}).Run(&results)
+						ar.Where(QueryCondition{Key: "year", RelationalOperator: EQ, Value: 2010})
+						ar.Where(QueryCondition{LogicalOperator: OR, Key: "model", RelationalOperator: EQ, Value: "veyron"})
+						err := ar.Where(QueryCondition{LogicalOperator: OR, Key: "model", RelationalOperator: EQ, Value: "gobbledygook"}).Run(&results)
 
 						Ω(err).NotTo(HaveOccurred())
 						Ω(results).ShouldNot(BeNil())
@@ -233,8 +233,8 @@ var _ = Describe("Orchestrate", func() {
 			Context("Query Transformations", func() {
 				Context("Order Bys", func() {
 					It("should order one field ASC", func() {
-						ar.Where(QueryCondition{Key: "Year", RelationalOperator: GTE, Value: 2010})
-						err := ar.Order(OrderBy{Key: "Model", SortOrder: ASC}).Run(&results)
+						ar.Where(QueryCondition{Key: "year", RelationalOperator: GTE, Value: 2010})
+						err := ar.Order(OrderBy{Key: "model", SortOrder: ASC}).Run(&results)
 
 						Ω(err).NotTo(HaveOccurred())
 						Ω(results).ShouldNot(BeNil())
@@ -246,8 +246,8 @@ var _ = Describe("Orchestrate", func() {
 					})
 
 					It("should order one field DESC", func() {
-						ar.Where(QueryCondition{Key: "Year", RelationalOperator: GTE, Value: 2010})
-						err := ar.Order(OrderBy{Key: "Model", SortOrder: DESC}).Run(&results)
+						ar.Where(QueryCondition{Key: "year", RelationalOperator: GTE, Value: 2010})
+						err := ar.Order(OrderBy{Key: "model", SortOrder: DESC}).Run(&results)
 
 						Ω(err).NotTo(HaveOccurred())
 						Ω(results).ShouldNot(BeNil())
@@ -259,9 +259,9 @@ var _ = Describe("Orchestrate", func() {
 					})
 
 					It("should order the first field ASC and a second field ASC", func() {
-						ar.Where(QueryCondition{Key: "Year", RelationalOperator: GTE, Value: 2010})
-						ar.Order(OrderBy{Key: "Year", SortOrder: ASC})
-						err := ar.Order(OrderBy{Key: "Model", SortOrder: ASC}).Run(&results)
+						ar.Where(QueryCondition{Key: "year", RelationalOperator: GTE, Value: 2010})
+						ar.Order(OrderBy{Key: "year", SortOrder: ASC})
+						err := ar.Order(OrderBy{Key: "model", SortOrder: ASC}).Run(&results)
 
 						Ω(err).NotTo(HaveOccurred())
 						Ω(results).ShouldNot(BeNil())
@@ -273,9 +273,9 @@ var _ = Describe("Orchestrate", func() {
 					})
 
 					It("should order the first field ASC and a second field DESC", func() {
-						ar.Where(QueryCondition{Key: "Year", RelationalOperator: GTE, Value: 2010})
-						ar.Order(OrderBy{Key: "Year", SortOrder: ASC})
-						err := ar.Order(OrderBy{Key: "Model", SortOrder: DESC}).Run(&results)
+						ar.Where(QueryCondition{Key: "year", RelationalOperator: GTE, Value: 2010})
+						ar.Order(OrderBy{Key: "year", SortOrder: ASC})
+						err := ar.Order(OrderBy{Key: "model", SortOrder: DESC}).Run(&results)
 
 						Ω(err).NotTo(HaveOccurred())
 						Ω(results).ShouldNot(BeNil())
@@ -287,9 +287,9 @@ var _ = Describe("Orchestrate", func() {
 					})
 
 					It("should order first field DESC and a second field ASC", func() {
-						ar.Where(QueryCondition{Key: "Year", RelationalOperator: GTE, Value: 2010})
-						ar.Order(OrderBy{Key: "Year", SortOrder: DESC})
-						err := ar.Order(OrderBy{Key: "Model", SortOrder: ASC}).Run(&results)
+						ar.Where(QueryCondition{Key: "year", RelationalOperator: GTE, Value: 2010})
+						ar.Order(OrderBy{Key: "year", SortOrder: DESC})
+						err := ar.Order(OrderBy{Key: "model", SortOrder: ASC}).Run(&results)
 
 						Ω(err).NotTo(HaveOccurred())
 						Ω(results).ShouldNot(BeNil())
@@ -301,9 +301,9 @@ var _ = Describe("Orchestrate", func() {
 					})
 
 					It("should order the first field DESC and a second field DESC", func() {
-						ar.Where(QueryCondition{Key: "Year", RelationalOperator: GTE, Value: 2010})
-						ar.Order(OrderBy{Key: "Year", SortOrder: DESC})
-						err := ar.Order(OrderBy{Key: "Model", SortOrder: DESC}).Run(&results)
+						ar.Where(QueryCondition{Key: "year", RelationalOperator: GTE, Value: 2010})
+						ar.Order(OrderBy{Key: "year", SortOrder: DESC})
+						err := ar.Order(OrderBy{Key: "model", SortOrder: DESC}).Run(&results)
 
 						Ω(err).NotTo(HaveOccurred())
 						Ω(results).ShouldNot(BeNil())

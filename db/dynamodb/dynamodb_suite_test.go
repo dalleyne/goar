@@ -12,7 +12,7 @@ import (
 type DynamodbAutomobile struct {
 	ArDynamodb
 	Automobile
-	SafetyRating int
+	SafetyRating int `json:"safety_rating,omitempty"`
 }
 
 func (m *DynamodbAutomobile) CustomModelName() string {
