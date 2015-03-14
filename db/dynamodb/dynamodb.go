@@ -61,6 +61,10 @@ func Client() *dynamo.Server {
 	return client
 }
 
+func (ar *ArDynamodb) SetKey(key string) {
+	ar.ID = key
+}
+
 func (ar *ArDynamodb) All(models interface{}, opts map[string]interface{}) (err error) {
 	return errors.New("All method not supported by Dynamodb.  Create a View instead.")
 }

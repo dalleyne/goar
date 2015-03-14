@@ -31,32 +31,32 @@ var _ = Describe("Orchestrate", func() {
 			//ModelS = OrchestrateAutomobile{SafetyRating: 5, Automobile: Automobile{Vehicle: Vehicle{Make: "tesla", Year: 2009, Model: "model s"}}}.ToActiveRecord()
 			ModelS = OrchestrateAutomobile{SafetyRating: 5, Automobile: Automobile{Vehicle: Vehicle{Make: "tesla", Year: 2009, Model: "model s"}}}
 			ToAR(&ModelS)
-			ModelS.ID = "id1"
+			ModelS.SetKey("id1")
 			Ω(ModelS.Valid()).Should(BeTrue())
 
 			MK = OrchestrateAutomobile{SafetyRating: 3, Automobile: Automobile{Vehicle: Vehicle{Make: "austin healey", Year: 1960, Model: "3000"}}}
 			ToAR(&MK)
-			MK.ID = "id2"
+			MK.SetKey("id2")
 			Ω(MK.Valid()).Should(BeTrue())
 
 			Sprite = OrchestrateAutomobile{SafetyRating: 2, Automobile: Automobile{Vehicle: Vehicle{Make: "austin healey", Year: 1960, Model: "sprite"}}}
 			ToAR(&Sprite)
-			Sprite.ID = "id3"
+			Sprite.SetKey("id3")
 			Ω(Sprite.Valid()).Should(BeTrue())
 
 			Panamera = OrchestrateAutomobile{SafetyRating: 5, Automobile: Automobile{Vehicle: Vehicle{Make: "porsche", Year: 2010, Model: "panamera"}}}
 			ToAR(&Panamera)
-			Panamera.ID = "id4"
+			Panamera.SetKey("id4")
 			Ω(Panamera.Valid()).Should(BeTrue())
 
 			Evoque = OrchestrateAutomobile{SafetyRating: 1, Automobile: Automobile{Vehicle: Vehicle{Make: "land rover", Year: 2013, Model: "evoque"}}}
 			ToAR(&Evoque)
-			Evoque.ID = "id5"
+			Evoque.SetKey("id5")
 			Ω(Evoque.Valid()).Should(BeTrue())
 
 			Bugatti = OrchestrateAutomobile{SafetyRating: 4, Automobile: Automobile{Vehicle: Vehicle{Make: "bugatti", Year: 2013, Model: "veyron"}}}
 			ToAR(&Bugatti)
-			Bugatti.ID = "id6"
+			Bugatti.SetKey("id6")
 			Ω(Bugatti.Valid()).Should(BeTrue())
 		})
 

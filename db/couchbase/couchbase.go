@@ -68,6 +68,10 @@ func Client() *couchbase.Bucket {
 	return client
 }
 
+func (ar *ArCouchbase) SetKey(key string) {
+	ar.ID = key
+}
+
 func (ar *ArCouchbase) All(models interface{}, opts map[string]interface{}) (err error) {
 	return errors.New("All method not supported by Couchbase.  Create a View instead.")
 }

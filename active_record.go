@@ -28,6 +28,7 @@ type ActiveRecordInterfacer interface {
 	Validater
 	Querier
 	ModelName() string
+	SetKey(string)
 	//PrimaryKey() string
 	Self() ActiveRecordInterfacer
 	SetSelf(ActiveRecordInterfacer)

@@ -47,6 +47,10 @@ func Client() *c.Client {
 	return client
 }
 
+func (ar *ArOrchestrate) SetKey(key string) {
+	ar.ID = key
+}
+
 func (ar *ArOrchestrate) All(models interface{}, opts map[string]interface{}) (err error) {
 	var limit int = 10 // per Orchestrate's documentation: 10 default, 100 max
 	var response *c.KVResults

@@ -33,32 +33,32 @@ var _ = Describe("Dynamodb", func() {
 		BeforeEach(func() {
 			ModelS = DynamodbAutomobile{SafetyRating: 5, Automobile: Automobile{Vehicle: Vehicle{Make: "tesla", Year: 2009, Model: "model s"}}}
 			ToAR(&ModelS)
-			ModelS.ID = "id1"
+			ModelS.SetKey("id1")
 			Ω(ModelS.Valid()).Should(BeTrue())
 
 			MK = DynamodbAutomobile{SafetyRating: 3, Automobile: Automobile{Vehicle: Vehicle{Make: "austin healey", Year: 1960, Model: "3000"}}}
 			ToAR(&MK)
-			MK.ID = "id2"
+			MK.SetKey("id2")
 			Ω(MK.Valid()).Should(BeTrue())
 
 			Sprite = DynamodbAutomobile{SafetyRating: 2, Automobile: Automobile{Vehicle: Vehicle{Make: "austin healey", Year: 1960, Model: "sprite"}}}
 			ToAR(&Sprite)
-			Sprite.ID = "id3"
+			Sprite.SetKey("id3")
 			Ω(Sprite.Valid()).Should(BeTrue())
 
 			Panamera = DynamodbAutomobile{SafetyRating: 5, Automobile: Automobile{Vehicle: Vehicle{Make: "porsche", Year: 2010, Model: "panamera"}}}
 			ToAR(&Panamera)
-			Panamera.ID = "id4"
+			Panamera.SetKey("id4")
 			Ω(Panamera.Valid()).Should(BeTrue())
 
 			Evoque = DynamodbAutomobile{SafetyRating: 1, Automobile: Automobile{Vehicle: Vehicle{Make: "land rover", Year: 2013, Model: "evoque"}}}
 			ToAR(&Evoque)
-			Evoque.ID = "id5"
+			Evoque.SetKey("id5")
 			Ω(Evoque.Valid()).Should(BeTrue())
 
 			Bugatti = DynamodbAutomobile{SafetyRating: 4, Automobile: Automobile{Vehicle: Vehicle{Make: "bugatti", Year: 2013, Model: "veyron"}}}
 			ToAR(&Bugatti)
-			Bugatti.ID = "id6"
+			Bugatti.SetKey("id6")
 			Ω(Bugatti.Valid()).Should(BeTrue())
 		})
 
@@ -105,7 +105,7 @@ var _ = Describe("Dynamodb", func() {
 
 			It("should return an error when trying to patch an ID that doesn't exist", func() {
 				auto := DynamodbAutomobile{}.ToActiveRecord()
-				auto.ID = "does not exist"
+				auto.SetKey("does not exist")
 				success, err := auto.Patch()
 				Expect(err).To(HaveOccurred())
 				Ω(success).Should(BeFalse())
@@ -179,7 +179,7 @@ var _ = Describe("Dynamodb", func() {
 
 				// partial update
 				s2 := DynamodbAutomobile{SafetyRating: safetyRating + 1}.ToActiveRecord()
-				s2.ID = Sprite.ID
+				s2.SetKey(Sprite.ID)
 				success, err := s2.Patch()
 				Ω(err).Should(BeNil())
 				Ω(s2.Validation.Errors).Should(BeNil())
