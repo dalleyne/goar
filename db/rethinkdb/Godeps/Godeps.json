@@ -9,8 +9,8 @@
 		},
 		{
 			"ImportPath": "github.com/dancannon/gorethink",
-			"Comment": "v0.6.3",
-			"Rev": "a05fb9f684e7bcf6ada71ff71b8b73ba28e63a6a"
+			"Comment": "v0.7.0",
+			"Rev": "b1a22480f24cc0624fa4c173719c72b503960523"
 		},
 		{
 			"ImportPath": "github.com/gedex/inflector",

@@ -14,8 +14,9 @@ import (
 
 type ArRethinkDb struct {
 	ActiveRecord
-	CreatedAt *time.Time `gorethink:"created_at,omitempty" json:"created_at,omitempty"`
-	UpdatedAt *time.Time `gorethink:"updated_at,omitempty" json:"updated_at,omitempty"`
+	Id        string    `gorethink:"id,omitempty"`
+	CreatedAt time.Time `gorethink:"created_at,omitempty" json:"created_at,omitempty"`
+	UpdatedAt time.Time `gorethink:"updated_at,omitempty" json:"updated_at,omitempty"`
 }
 
 var (
@@ -53,6 +54,10 @@ func DbName() string {
 
 func SetDbName(name string) {
 	dbName = name
+}
+
+func (ar *ArRethinkDb) SetKey(key string) {
+	ar.Id = key
 }
 
 func (ar *ArRethinkDb) All(results interface{}, opts map[string]interface{}) error {
@@ -110,6 +115,20 @@ func (ar *ArRethinkDb) Find(id interface{}) (interface{}, error) {
 	}
 
 	return modelInterface, err
+}
+
+func (ar *ArRethinkDb) Find2(id interface{}, out interface{}) error {
+	self := ar.Self()
+
+	row, err := r.Db(dbName).Table(self.ModelName()).Get(id).Run(session)
+
+	if err != nil {
+		log.Println(err)
+	} else {
+		err = row.One(out)
+	}
+
+	return err
 }
 
 func (ar *ArRethinkDb) DbSave() (err error) {

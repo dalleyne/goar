@@ -167,14 +167,43 @@ func (ar *ActiveRecord) Save() (success bool, err error) {
 		//  2) UpdatedAt is set upon subsequent updates
 		t := time.Now().UTC()
 		f := e.FieldByName("CreatedAt")
+		// log.Println("**********************************", reflect.TypeOf(f.Interface()).String())
 		if f.IsValid() {
-			if f.IsNil() {
-				f.Set(reflect.ValueOf(&t))
+			if reflect.TypeOf(f.Interface()).String() == "time.Time" {
+				if f.Interface().(time.Time).IsZero() {
+					f.Set(reflect.ValueOf(t))
+				} else {
+					f = e.FieldByName("UpdatedAt")
+					f.Set(reflect.ValueOf(t))
+				}
 			} else {
-				f = e.FieldByName("UpdatedAt")
-				f.Set(reflect.ValueOf(&t))
+				if f.IsNil() {
+					f.Set(reflect.ValueOf(&t))
+				} else {
+					f = e.FieldByName("UpdatedAt")
+					f.Set(reflect.ValueOf(&t))
+				}
 			}
 		}
+
+		// if f.IsValid() {
+		// 	log.Println("NELS!!!!!!!!!!!!!!!!!!!!!!!!!")
+		// 	log.Println("CreatedAt value:", f.Interface())
+		// 	log.Println("CreatedAt type:", reflect.TypeOf(f.Interface()))
+		// 	log.Println(f.Interface())
+		// 	log.Println(reflect.Zero(reflect.TypeOf(f.Interface())))
+		// 	log.Println(reflect.Zero(reflect.TypeOf(f.Interface())).Interface())
+		// 	// if f.Interface() == reflect.Zero(reflect.TypeOf(f.Interface())) {
+		// 	// if f.Interface() == reflect.Zero(reflect.TypeOf(f)) {
+		// 	if f.Interface() == reflect.Zero(reflect.TypeOf(f.Interface())).Interface() {
+		// 		log.Println("Obie")
+		// 		f.Set(reflect.ValueOf(t))
+		// 	} else {
+		// 		log.Println("Gigi")
+		// 		f = e.FieldByName("UpdatedAt")
+		// 		f.Set(reflect.ValueOf(t))
+		// 	}
+		// }
 
 		// save changes
 		err = ar.self.(Persister).DbSave()
