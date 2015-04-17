@@ -99,25 +99,7 @@ func (ar *ArRethinkDb) Truncate() (numRowsDeleted int, err error) {
 	return 0, err
 }
 
-func (ar *ArRethinkDb) Find(id interface{}) (interface{}, error) {
-	self := ar.Self()
-	modelVal := reflect.ValueOf(self).Elem()
-	modelInterface := reflect.New(modelVal.Type()).Interface()
-
-	row, err := r.Db(dbName).Table(self.ModelName()).Get(id).Run(session)
-
-	if err != nil {
-		log.Println(err)
-	} else if row.IsNil() {
-		modelInterface = nil
-	} else {
-		err = row.One(&modelInterface)
-	}
-
-	return modelInterface, err
-}
-
-func (ar *ArRethinkDb) Find2(id interface{}, out interface{}) error {
+func (ar *ArRethinkDb) Find(id interface{}, out interface{}) error {
 	self := ar.Self()
 
 	row, err := r.Db(dbName).Table(self.ModelName()).Get(id).Run(session)
@@ -125,7 +107,12 @@ func (ar *ArRethinkDb) Find2(id interface{}, out interface{}) error {
 	if err != nil {
 		log.Println(err)
 	} else {
-		err = row.One(out)
+		if row.IsNil() { // return a not found error
+			err = errors.New("record not found")
+			log.Println("record not found for key:", id)
+		} else {
+			err = row.One(out)
+		}
 	}
 
 	return err

@@ -36,7 +36,7 @@ type ActiveRecordInterfacer interface {
 	//SetQuery(*Query)
 	Truncate() (numRowsDeleted int, err error)
 	All(results interface{}, opts map[string]interface{}) error
-	Find(interface{}) (interface{}, error)
+	Find(id interface{}, out interface{}) error
 	Save() (success bool, err error)
 	Delete() error
 }

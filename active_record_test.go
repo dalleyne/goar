@@ -28,6 +28,10 @@ type CallbackErrorModel struct {
 	Name string
 }
 
+func (ar *ActiveRecordVehicle) SetKey(key string) {
+
+}
+
 func (ar *ActiveRecordVehicle) All(interface{}, map[string]interface{}) error {
 	return nil
 }
@@ -36,8 +40,8 @@ func (ar *ActiveRecordVehicle) Truncate() (numRowsDeleted int, err error) {
 	return 0, nil
 }
 
-func (ar *ActiveRecordVehicle) Find(id interface{}) (interface{}, error) {
-	return nil, nil
+func (ar *ActiveRecordVehicle) Find(id interface{}, out interface{}) error {
+	return nil
 }
 
 func (model ActiveRecordAutomobile) ToActiveRecord() *ActiveRecordAutomobile {
