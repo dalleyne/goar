@@ -100,9 +100,7 @@ func (ar *ArRethinkDb) Truncate() (numRowsDeleted int, err error) {
 }
 
 func (ar *ArRethinkDb) Find(id interface{}, out interface{}) error {
-	self := ar.Self()
-
-	row, err := r.Db(dbName).Table(self.ModelName()).Get(id).Run(session)
+	row, err := r.Db(dbName).Table(ar.ModelName()).Get(id).Run(session)
 
 	if err != nil {
 		log.Println(err)

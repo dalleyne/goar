@@ -13,8 +13,8 @@ import (
 
 var _ = Describe("Orchestrate", func() {
 	var (
-		ModelS, MK, Sprite, Panamera, Evoque, Bugatti OrchestrateAutomobile
-		ar                                            *OrchestrateAutomobile
+		ModelS, MK, Sprite, Panamera, Evoque, Bugatti, Out OrchestrateAutomobile
+		ar                                                 *OrchestrateAutomobile
 	)
 
 	BeforeEach(func() {
@@ -64,9 +64,9 @@ var _ = Describe("Orchestrate", func() {
 			It("should create a model and find it by id", func() {
 				Ω(ModelS.Save()).Should(BeTrue())
 
-				result, _ := OrchestrateAutomobile{}.ToActiveRecord().Find(ModelS.ID)
-				Ω(result).ShouldNot(BeNil())
-				model := result.(*OrchestrateAutomobile)
+				model := Out
+				err := OrchestrateAutomobile{}.ToActiveRecord().Find(ModelS.ID, &model)
+				Ω(err).NotTo(HaveOccurred())
 				Ω(model.ID).Should(Equal(ModelS.ID))
 			})
 
@@ -88,41 +88,45 @@ var _ = Describe("Orchestrate", func() {
 				modelName := Sprite.Model
 
 				// create
-				result, _ := ar.Find(Sprite.ID)
-				Ω(result).ShouldNot(BeNil())
-				dbModel := result.(*OrchestrateAutomobile).ToActiveRecord()
-				Ω(dbModel.ID).Should(Equal(Sprite.ID))
-				Ω(dbModel.CreatedAt).ShouldNot(BeNil())
-				Ω(dbModel.UpdatedAt).Should(BeNil())
+				result := Out
+				err := ar.Find(Sprite.ID, &result)
+				Ω(err).NotTo(HaveOccurred())
+				Ω(result.ID).Should(Equal(Sprite.ID))
+				Ω(result.CreatedAt).ShouldNot(BeNil())
+				Ω(result.UpdatedAt).Should(BeNil())
 
 				// update
+				dbModel := result.ToActiveRecord()
 				dbModel.Year += 1
 				dbModel.Model += " updated"
 				Ω(dbModel.Save()).Should(BeTrue())
 
 				// verify updates
-				result, err := ar.Find(Sprite.ID)
+				result = Out
+				err = ar.Find(Sprite.ID, &result)
 				Expect(err).NotTo(HaveOccurred())
-				Ω(result).ShouldNot(BeNil())
-				Ω(dbModel.Year).Should(Equal(year + 1))
-				Ω(dbModel.Model).Should(Equal(modelName + " updated"))
-				Ω(dbModel.CreatedAt).ShouldNot(BeNil())
-				Ω(dbModel.UpdatedAt).ShouldNot(BeNil())
+				Ω(result.Year).Should(Equal(year + 1))
+				Ω(result.Model).Should(Equal(modelName + " updated"))
+				Ω(result.CreatedAt).ShouldNot(BeNil())
+				Ω(result.UpdatedAt).ShouldNot(BeNil())
 			})
 
 			It("should delete an existing model", func() {
 				// create and verify
 				Ω(MK.Save()).Should(BeTrue())
-				result, _ := ar.Find(MK.ID)
-				Ω(result).ShouldNot(BeNil())
+				model := Out
+				err := ar.Find(MK.ID, &model)
+				Ω(err).NotTo(HaveOccurred())
 
 				// delete
-				err := MK.Delete()
+				err = MK.Delete()
 				Ω(err).NotTo(HaveOccurred())
 
 				// verify delete
-				result, _ = ar.Find(MK.ID)
-				Ω(result).Should(BeNil())
+				model = Out
+				err = ar.Find(MK.ID, &model)
+				Expect(err).To(HaveOccurred())
+				Ω(err.Error()).Should(Equal("record not found"))
 			})
 
 			It("should return all models", func() {

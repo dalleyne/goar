@@ -85,20 +85,16 @@ func (ar *ArOrchestrate) Truncate() (numRowsDeleted int, err error) {
 	return -1, err
 }
 
-func (ar *ArOrchestrate) Find(id interface{}) (interface{}, error) {
-	self := ar.Self()
-	modelVal := reflect.ValueOf(self).Elem()
-	modelInterface := reflect.New(modelVal.Type()).Interface()
-
+func (ar *ArOrchestrate) Find(id interface{}, out interface{}) error {
 	result, err := client.Get(ar.ModelName(), id.(string))
 
 	if result != nil {
-		err = result.Value(&modelInterface)
+		err = result.Value(&out)
 	} else {
-		modelInterface = nil
+		err = errors.New("record not found")
 	}
 
-	return modelInterface, err
+	return err
 }
 
 func (ar *ArOrchestrate) DbSave() error {
