@@ -23,7 +23,7 @@ func (e *ValidationError) String() string {
 
 // A Validation context manages data validation and error messages.
 type Validation struct {
-	Errors []*ValidationError `json:",omitempty"`
+	Errors []*ValidationError `gorethink:"-" json:"-"`
 	keep   bool
 }
 
