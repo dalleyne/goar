@@ -40,7 +40,6 @@ func (dbModel OrchestrateAutomobile) AssertDbPropertyMappings(model OrchestrateA
 
 	Ω(dbModel.CreatedAt).ShouldNot(BeNil())
 	if isDbUpdate {
-
 		Ω(dbModel.UpdatedAt).ShouldNot(BeNil())
 	} else {
 		Ω(dbModel.UpdatedAt).Should(BeNil())

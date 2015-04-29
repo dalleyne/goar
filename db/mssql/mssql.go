@@ -6,21 +6,26 @@ import (
 	"log"
 	"strconv"
 
-	"database/sql"
-
 	_ "github.com/denisenkom/go-mssqldb"
+	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
 	. "github.com/obieq/goar"
 )
 
 type ArMsSql struct {
 	ActiveRecord
-	ID string `json:"id,omitempty"`
+	ID int `gorm:"primary_key" json:"id,omitempty"`
+	//ID string `sql:"type:varchar(36)" gorm:"primary_key" json:"id,omitempty"`
 	Timestamps
 }
 
+// interface assertions
+// https://splice.com/blog/golang-verify-type-implements-interface-compile-time/
+var _ Persister = (*ArMsSql)(nil)
+var _ RDBMSer = (*ArMsSql)(nil)
+
 var (
-	client *sql.DB
+	client gorm.DB
 )
 
 var connectOpts = func() map[string]string {
@@ -31,61 +36,93 @@ var connectOpts = func() map[string]string {
 		log.Println("OBIE:", envs)
 		opts["server"] = envs["MSSQL_SERVER"]
 		opts["port"] = envs["MSSQL_PORT"]
+		opts["db_name"] = envs["MSSQL_DB_NAME"]
 		opts["username"] = envs["MSSQL_USERNAME"]
 		opts["password"] = envs["MSSQL_PASSWORD"]
+		opts["max_idle_connections"] = envs["MSSQL_MAX_IDLE_CONNECTIONS"]
+		opts["max_open_connections"] = envs["MSSQL_MAX_OPEN_CONNECTIONS"]
 		opts["debug"] = envs["MSSQL_DEBUG"]
 	}
 
 	return opts
 }
 
-func connect() (client *sql.DB) {
+func connect() (client gorm.DB) {
 	opts := connectOpts()
 	server := opts["server"]
+	db_name := opts["db_name"]
 	username := opts["username"]
 	password := opts["password"]
+
 	port, err := strconv.Atoi(opts["port"])
 	if err != nil {
 		log.Fatal("mssql port number is improperly formatted")
 	}
+
+	max_idle_connections, err := strconv.Atoi(opts["max_idle_connections"])
+	if err != nil {
+		log.Fatal("mssql max idle connections is improperly formatted")
+	}
+
+	max_open_connections, err := strconv.Atoi(opts["max_open_connections"])
+	if err != nil {
+		log.Fatal("mssql max open connections number is improperly formatted")
+	}
+
 	debug, err := strconv.ParseBool(opts["debug"])
 	if err != nil {
 		log.Fatal("mssql debug value is improperly formatted")
 	}
 
-	connString := fmt.Sprintf("server=%s;port=%d;user id=%s;password=%s", server, port, username, password)
+	connString := fmt.Sprintf("server=%s;port=%d;database=%s;user id=%s;password=%s", server, port, db_name, username, password)
 
 	if debug {
 		log.Printf(" connString:%s\n", connString)
 	}
 
-	// open the connection
-	conn, err := sql.Open("mssql", connString)
-
+	db, err := gorm.Open("mssql", connString)
 	if err != nil {
-		log.Fatal("Open mssql connection failed:", err.Error())
+		log.Fatal("Open mssql database failed:", err)
 	}
-	defer conn.Close()
+
+	// set connection properties
+	db.DB().SetMaxIdleConns(max_idle_connections)
+	db.DB().SetMaxOpenConns(max_open_connections)
+
+	// set log mode
+	db.LogMode(debug)
+
+	// open the connection
+	//conn := db.DB()
+	////conn, err := sql.Open("mssql", connString)
+
+	//if err != nil {
+	//log.Fatal("Open mssql connection failed:", err.Error())
+	//}
+	//defer conn.Close()
 
 	// test the connection
-	err = conn.Ping()
+	//err = conn.Ping()
+	err = db.DB().Ping()
 	if err != nil {
 		log.Fatal("Cannot connect to sql server:", err.Error())
 	}
 
-	return conn
+	//return conn
+	return db
 }
 
 func init() {
 	client = connect()
 }
 
-func Client() *sql.DB {
+func Client() gorm.DB {
 	return client
 }
 
 func (ar *ArMsSql) SetKey(key string) {
-	ar.ID = key
+	// TODO: set guid key here once that's implemented
+	//ar.ID = key
 }
 
 func (ar *ArMsSql) All(models interface{}, opts map[string]interface{}) (err error) {
@@ -99,12 +136,11 @@ func (ar *ArMsSql) All(models interface{}, opts map[string]interface{}) (err err
 		}
 	}
 
-	//return mapResults(response.Results, models)
-	return nil
+	return client.Find(models).Error
 }
 
 func (ar *ArMsSql) Truncate() (numRowsDeleted int, err error) {
-	return -1, nil
+	return -1, client.Exec("TRUNCATE TABLE " + ar.ModelName()).Error
 }
 
 func (ar *ArMsSql) Find(id interface{}, out interface{}) error {
@@ -116,16 +152,19 @@ func (ar *ArMsSql) Find(id interface{}, out interface{}) error {
 	//err = errors.New("record not found")
 	//}
 
-	return nil
+	return client.First(out, id).Error
+	//return nil
 }
 
 func (ar *ArMsSql) DbSave() error {
 	var err error
 
 	//if ar.UpdatedAt != nil {
-	//_, err = client.Put(ar.ModelName(), ar.ID, ar.Self())
+	//err = client.Save(ar.Self()).Error
+	////_, err = client.Put(ar.ModelName(), ar.ID, ar.Self())
 	//} else {
 	//_, err = client.PutIfAbsent(ar.ModelName(), ar.ID, ar.Self())
+	err = client.Create(ar.Self()).Error
 	//}
 
 	return err
@@ -173,6 +212,10 @@ func (ar *ArMsSql) DbSearch(models interface{}) (err error) {
 
 	//return mapResults(response.Results, models)
 	return nil
+}
+
+func (ar *ArMsSql) SpExecResultSet(spName string, params map[string]interface{}, models interface{}) (err error) {
+	return client.Raw("exec " + spName).Scan(models).Error
 }
 
 //func processPlucks(query r.Term, ar *ArRethinkDb) r.Term {

@@ -24,6 +24,10 @@ type Persister interface {
 	DbSearch(results interface{}) error
 }
 
+type RDBMSer interface {
+	SpExecResultSet(spName string, params map[string]interface{}, results interface{}) error
+}
+
 type ActiveRecordInterfacer interface {
 	Validater
 	Querier
