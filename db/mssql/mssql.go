@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"reflect"
 	"strconv"
+	"strings"
 
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/jinzhu/gorm"
@@ -215,7 +217,31 @@ func (ar *ArMsSql) DbSearch(models interface{}) (err error) {
 }
 
 func (ar *ArMsSql) SpExecResultSet(spName string, params map[string]interface{}, models interface{}) (err error) {
-	return client.Raw("exec " + spName).Scan(models).Error
+	if params == nil {
+		return client.Raw("exec " + spName).Scan(models).Error
+	} else {
+		return client.Raw("exec " + spName + buildSpParams(params)).Scan(models).Error
+	}
+}
+
+func buildSpParams(params map[string]interface{}) string {
+	var kvs []string
+	key := ""
+
+	for k, v := range params {
+		key = " @" + k + " = "
+
+		switch v.(type) {
+		case string:
+			kvs = append(kvs, key+"'"+v.(string)+"'")
+		case int:
+			kvs = append(kvs, key+strconv.Itoa(v.(int)))
+		default:
+			log.Panic("the following stored proc param type has not been implemented: ", reflect.TypeOf(v))
+		}
+	}
+
+	return strings.Join(kvs, ",")
 }
 
 //func processPlucks(query r.Term, ar *ArRethinkDb) r.Term {

@@ -189,7 +189,7 @@ var _ = Describe("MsSql", func() {
 		})
 
 		Context("Stored Procedures", func() {
-			It("should execute a stored procedure that returns a results set (array)", func() {
+			It("should execute a non-parameterized stored procedure that returns a results set (array)", func() {
 				var autos []MsSqlAutomobile
 
 				Ω(ModelS.Save()).Should(BeTrue())
@@ -198,7 +198,7 @@ var _ = Describe("MsSql", func() {
 				Ω(Sprite.Save()).Should(BeTrue())
 				Ω(Sprite.ID).Should(BeNumerically(">", ModelS.ID))
 
-				err := MsSqlAutomobile{}.ToActiveRecord().SpExecResultSet("spAllAutos", nil, &autos)
+				err := MsSqlAutomobile{}.ToActiveRecord().SpExecResultSet(AUTO_LIST_SP_NAME, nil, &autos)
 				Ω(err).NotTo(HaveOccurred())
 
 				//verify
@@ -206,6 +206,37 @@ var _ = Describe("MsSql", func() {
 				Ω(len(autos)).Should(Equal(2))
 				Ω(autos[0].ID).Should(Equal(ModelS.ID))
 				Ω(autos[1].ID).Should(Equal(Sprite.ID))
+			})
+
+			It("should execute a parameterized stored procedure that returns a results set (array)", func() {
+				var autos []MsSqlAutomobile
+
+				Ω(ModelS.Save()).Should(BeTrue())
+				Ω(ModelS.ID).Should(BeNumerically(">", 0))
+
+				Ω(Sprite.Save()).Should(BeTrue())
+				Ω(Sprite.ID).Should(BeNumerically(">", ModelS.ID))
+
+				Ω(MK.Save()).Should(BeTrue())
+				Ω(MK.ID).Should(BeNumerically(">", Sprite.ID))
+
+				Ω(Panamera.Save()).Should(BeTrue())
+				Ω(Panamera.ID).Should(BeNumerically(">", MK.ID))
+
+				Ω(Evoque.Save()).Should(BeTrue())
+				Ω(Evoque.ID).Should(BeNumerically(">", Panamera.ID))
+
+				params := map[string]interface{}{"Id": 1, "Model": Sprite.Model}
+
+				err := MsSqlAutomobile{}.ToActiveRecord().SpExecResultSet(AUTO_LIST_WITH_PARAMS_SP_NAME, params, &autos)
+				Ω(err).NotTo(HaveOccurred())
+
+				//verify
+				// NOTE: the stored proc returns resultset sorted by id ASC
+				Ω(len(autos)).Should(Equal(3))
+				Ω(autos[0].ID).Should(Equal(MK.ID))
+				Ω(autos[1].ID).Should(Equal(Panamera.ID))
+				Ω(autos[2].ID).Should(Equal(Evoque.ID))
 			})
 		}) // end Context("Stored Procedures")
 

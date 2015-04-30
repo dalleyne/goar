@@ -10,6 +10,11 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+const (
+	AUTO_LIST_SP_NAME             = "spMsSqlAutomobileList"
+	AUTO_LIST_WITH_PARAMS_SP_NAME = "spMsSqlAutomobileListWithParams"
+)
+
 type MsSqlAutomobile struct {
 	ArMsSql
 	Automobile
@@ -51,7 +56,23 @@ var _ = BeforeSuite(func() {
 
 	// clean up previous test data
 	client.DropTable(&MsSqlAutomobile{})
+	client.Exec("DROP PROCEDURE " + AUTO_LIST_SP_NAME + ";")
+	client.Exec("DROP PROCEDURE " + AUTO_LIST_WITH_PARAMS_SP_NAME + ";")
+
+	// prep for new test run
+	tblName := MsSqlAutomobile{}.ToActiveRecord().ModelName()
 	client.CreateTable(&MsSqlAutomobile{})
+	client.Exec("CREATE PROCEDURE " + AUTO_LIST_SP_NAME + " " +
+		"AS " +
+		"BEGIN SELECT * FROM dbo." + tblName + " " +
+		"ORDER BY id ASC " +
+		"END;")
+	client.Exec("CREATE PROCEDURE " + AUTO_LIST_WITH_PARAMS_SP_NAME + " @Id int, @Model nvarchar(20) " +
+		"AS " +
+		"BEGIN SELECT * FROM dbo." + tblName + " " +
+		"WHERE id > @Id AND model <> @Model " +
+		"ORDER BY id ASC " +
+		"END;")
 })
 
 var _ = AfterSuite(func() {
