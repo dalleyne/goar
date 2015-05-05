@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	as "github.com/obieq/goar/active_support"
-	. "github.com/obieq/goar/validations"
+	gas "github.com/obieq/gas"
+	. "github.com/obieq/goar-validations"
 )
 
 var modelNames map[string]string = map[string]string{}
@@ -73,7 +73,7 @@ func (ar *ActiveRecord) ModelName() string {
 	if name == "" {
 		arr := strings.Split(key, ".")
 		structName := arr[len(arr)-1]
-		name = as.String(as.String(structName).Pluralize()).Underscore()
+		name = gas.String(gas.String(structName).Pluralize()).Underscore()
 		modelNames[key] = name
 	}
 
